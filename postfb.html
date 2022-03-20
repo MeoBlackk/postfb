@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Tự Động Đăng Bài Vào Group</title>
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-12">
+          <div class="form-group">
+            <label for="first">Token Facebook</label>
+            <input type="text" class="form-control" placeholder="Nhập Token Facebook..." id="access-token">
+          </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+          <div class="form-group">
+            <label for="first">ID Nhóm Cần Đăng Bài</label>
+            <textarea type="text" class="form-control" placeholder="Nhập Id Nhóm..." id="spam-target"></textarea>
+          </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+          <div class="form-group">
+            <label for="last">Nội Dung Đăng</label>
+            <textarea type="text" class="form-control" placeholder="Nhập Nội Dung..." id="spam-message"></textarea>
+          </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+          <div class="form-group">
+            <label for="last">Link Ảnh (Bắt Buộc)</label>
+            <input type="text" class="form-control" placeholder="Link Ảnh" id="spam-attachment">
+          </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+          <div class="form-group">
+            <label for="last">Thời Gian Delay Mỗi Bài Đăng</label>
+            <input type="text" class="form-control" placeholder="Thời Gian..." id="spam-timer" value="10000">
+          </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6" id="logText">
+      
+      </div>
+    </div>
+    <button id="start-spam" class="btn btn-primary">Chạy</button>
+    <button id="clean-spam" class="btn btn-primary">Xoá Log</button>
+  </div>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+  <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
+  <script>
+    $("#start-spam").click(e => {
+        var counter = 0;
+        var countPost = 0;
+        let messages = $('#spam-message').val().split('|');
+        let targets = $('#spam-target').val().split(';');
+        let timer = $('#spam-timer').val();
+        targets.forEach(target => {
+            counter++;
+            setTimeout(() => {
+                let mess = messages[~~(Math.random() * messages.length)];
+                $.post("https://graph.facebook.com/" + target , {
+                    access_token: $('#access-token').val(),
+                    message: mess,
+                    
+                }).then(dataPost => {
+                    countPost++;
+                    var link = "https://www.facebook.com/" + dataPost.post_id;
+                    $('#logText').append('<span style="color: green;">Posted ' + countPost + ' on <a href="' + link + '" target="_blank">' + dataPost.post_id + '</a></span><br/>');
+                    if (countPost === targets.length) {
+                        timeOutDone();
+                    };
+                }).fail(() => {
+                    countPost++;
+                    var link = "https://www.facebook.com/" + target;
+                    $('#logText').append('<span style="color: red;">Failed to post ' + countPost + ' on <a href="' + link + '" target="_blank">' + target + '</a></span><br/>');
+                    if (countPost === targets.length) {
+                        timeOutDone();
+                    };
+                });
+            }, counter * timer);
+        });
+        $('#logText').append('<span style="color: black;font-weight: bold;"> - - - - Bắt Đầu - - - -</span><br/>');
+    });
+    $("#clean-spam").click(e => {
+        $('#logText').html("");
+    });
+    $("#group-spam").click(e => {
+        var groupsId = '';
+        $('#logText').html("");
+        $.get("https://graph.facebook.com/me/groups", {
+            access_token: $('#access-token').val()
+        }).then(dataGet => {
+            console.log(dataGet);
+            dataGet.data.forEach(groupId => {
+                groupsId += ';' + groupId.id;
+            });
+            $('#logText').html(groupsId.substring(1, groupsId.length));
+        }).fail(() => {
+            $('#logText').append('<span style="color: red;"> - - - - Lỗi - - - -</span><br/>');
+        });
+    });
+    function timeOutDone() {
+        $('#logText').append('<span style="color: blue;"> - - - - Xong - - - -</span><br/>');
+    };
+  </script>
+</body>
