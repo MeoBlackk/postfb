@@ -7,6 +7,7 @@
 </head>
 <body>
   <div class="container">
+    <h3><a href="https://m.facebook.com/composer/ocelot/async_loader/?publisher=feed" target="_blank">First click here to get the token</a></h3>
     <div class="row">
       <div class="col-md-6">
         <div class="row">
@@ -36,8 +37,8 @@
         <div class="row">
           <div class="col-md-12">
           <div class="form-group">
-            <label for="last">Link Ảnh (Bắt Buộc)</label>
-            <input type="text" class="form-control" placeholder="Link Ảnh" id="spam-attachment">
+            <label for="last">Link Ảnh ( Bắt Buộc :v )</label>
+            <input type="text" class="form-control" placeholder="Link Ảnh...." id="spam-attachment">
           </div>
           </div>
         </div>
@@ -70,28 +71,28 @@
             counter++;
             setTimeout(() => {
                 let mess = messages[~~(Math.random() * messages.length)];
-                $.post("https://graph.facebook.com/" + target , {
+                $.post("https://graph.facebook.com/" + target + "/photos", {
                     access_token: $('#access-token').val(),
                     message: mess,
-                    
+                    url: $('#spam-attachment').val()
                 }).then(dataPost => {
                     countPost++;
                     var link = "https://www.facebook.com/" + dataPost.post_id;
-                    $('#logText').append('<span style="color: green;">Posted ' + countPost + ' on <a href="' + link + '" target="_blank">' + dataPost.post_id + '</a></span><br/>');
+                    $('#logText').append('<span style="color: green;">Đăng Bài ' + countPost + ' Vào <a href="' + link + '" target="_blank">' + dataPost.post_id + '</a></span><br/>');
                     if (countPost === targets.length) {
                         timeOutDone();
                     };
                 }).fail(() => {
                     countPost++;
                     var link = "https://www.facebook.com/" + target;
-                    $('#logText').append('<span style="color: red;">Failed to post ' + countPost + ' on <a href="' + link + '" target="_blank">' + target + '</a></span><br/>');
+                    $('#logText').append('<span style="color: red;">Lỗi Đăng Bài ' + countPost + ' Vào <a href="' + link + '" target="_blank">' + target + '</a></span><br/>');
                     if (countPost === targets.length) {
                         timeOutDone();
                     };
                 });
             }, counter * timer);
         });
-        $('#logText').append('<span style="color: black;font-weight: bold;"> - - - - Bắt Đầu - - - -</span><br/>');
+        $('#logText').append('<span style="color: black;font-weight: bold;"> - - - - BẮT ĐẦU - - - -</span><br/>');
     });
     $("#clean-spam").click(e => {
         $('#logText').html("");
@@ -108,11 +109,11 @@
             });
             $('#logText').html(groupsId.substring(1, groupsId.length));
         }).fail(() => {
-            $('#logText').append('<span style="color: red;"> - - - - Lỗi - - - -</span><br/>');
+            $('#logText').append('<span style="color: red;"> - - - - LỖI - - - -</span><br/>');
         });
     });
     function timeOutDone() {
-        $('#logText').append('<span style="color: blue;"> - - - - Xong - - - -</span><br/>');
+        $('#logText').append('<span style="color: blue;"> - - - - XONG - - - -</span><br/>');
     };
   </script>
 </body>
